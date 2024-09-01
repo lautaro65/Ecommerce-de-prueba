@@ -1,13 +1,13 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/app/lib/dbConnect";
 import Product from "@/app/models/products";
 
-export async function POST(req: NextApiRequest, res: NextApiResponse) {
+export async function POST(req: NextRequest) {
   await dbConnect();
 
-  const notification = req.body;
-
   try {
+    const notification = await req.json();
+
     // Verificar el estado del pago (ejemplo: 'approved')
     if (notification.action === "payment.created" || notification.action === "payment.updated") {
       const paymentId = notification.data.id;
@@ -49,13 +49,13 @@ export async function POST(req: NextApiRequest, res: NextApiResponse) {
           }
         }
 
-        return res.status(200).json({ message: "Stock actualizado con éxito" });
+        return NextResponse.json({ message: "Stock actualizado con éxito" });
       }
     }
 
-    res.status(200).json({ message: "Notificación recibida" });
+    return NextResponse.json({ message: "Notificación recibida" });
   } catch (error) {
     console.error("Error procesando la notificación:", error);
-    res.status(500).json({ message: "Error al procesar la notificación" });
+    return NextResponse.json({ message: "Error al procesar la notificación" }, { status: 500 });
   }
 }
