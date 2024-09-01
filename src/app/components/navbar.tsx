@@ -257,15 +257,39 @@ const Navbar = () => {
                 >
                   Home
                 </Link>
-                {categorias.map((categoria, index) => (
-                  <Link
-                    key={index}
-                    href={`/${categoria.toLowerCase()}`}
-                    className="block px-4 py-2 text-base text-gray-900 bg-white rounded-lg hover:bg-gray-200 transition duration-200"
+                <div className="relative w-full">
+                  <button
+                    onClick={toggleDropdown}
+                    className="flex gap-2 items-center  p-2 bg-white rounded-md  w-full"
                   >
-                    {categoria}
-                  </Link>
-                ))}
+                    Categorías
+                    <FaArrowDown
+                      className={`transition-transform ${
+                        isOpenCategory ? "rotate-180" : "rotate-0"
+                      }`}
+                    />
+                  </button>
+                  <div
+                    className={`absolute left-0 bg-white border border-gray-200 shadow-lg rounded-md py-2
+          transition-all duration-300 ease-out w-full
+          ${
+            isOpenCategory
+              ? "max-h-36 opacity-100 overflow-y-auto"
+              : "max-h-0 opacity-0 overflow-hidden"
+          }
+        `}
+                  >
+                    {categorias.map((categoria, index) => (
+                      <button
+                        key={index}
+                        onClick={() => navigateWithParams(categoria)}
+                        className="block px-4 py-2 text-sm w-full text-gray-700 hover:bg-gray-100"
+                      >
+                        {categoria}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           </div>

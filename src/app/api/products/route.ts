@@ -8,6 +8,7 @@ export async function GET(req: NextRequest) {
     const products = await Product.find({});
     return NextResponse.json(products);
   } catch (error: any) {
+    console.error('Error fetching products:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
@@ -72,6 +73,7 @@ export async function POST(req: NextRequest) {
     await product.save();
     return NextResponse.json(product, { status: 201 });
   } catch (error: any) {
+    console.error('Error creating product:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
