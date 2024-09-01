@@ -1,9 +1,8 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse, NextRequest } from "next/server";
 import Product from "@/app/models/products";
 import dbConnect from "@/app/lib/dbConnect";
 
-export async function GET(req: NextApiRequest, res: NextApiResponse) {
+export async function GET(req: NextRequest) {
   await dbConnect();
   try {
     const products = await Product.find({});
@@ -13,7 +12,7 @@ export async function GET(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(req: NextRequest) {
   await dbConnect();
   try {
     const {
@@ -32,8 +31,9 @@ export async function POST(request: Request) {
       tags,
       status,
       swiperInicio,
-    } = await request.json();
+    } = await req.json();
 
+    // Convertir cantidades de stock a números
     for (let i = 0; i < stock.length; i++) {
       for (let j = 0; j < stock[i].quantity.length; j++) {
         if (typeof stock[i].quantity[j] === "string") {
@@ -42,24 +42,15 @@ export async function POST(request: Request) {
       }
     }
 
-    if (typeof dimensions.height != "number") {
-      dimensions.height = parseInt(dimensions.height, 10);
-    }
+    // Convertir dimensiones a números si no lo son
+    dimensions.height = parseInt(dimensions.height, 10);
+    dimensions.width = parseInt(dimensions.width, 10);
+    dimensions.length = parseInt(dimensions.length, 10);
 
-    if (typeof dimensions.width != "number") {
-      dimensions.width = parseInt(dimensions.width, 10);
-    }
+    // Convertir swiperInicio a string si no lo es
+    const swiperInicioString = String(swiperInicio);
 
-    if (typeof dimensions.length != "number") {
-      dimensions.length = parseInt(dimensions.length, 10);
-    }
-    if (typeof swiperInicio != "string") {
-      const swiperInicioString = String(swiperInicio);
-    }
-    const swiperInicioString = swiperInicio;
-
-
-    const products = new Product({
+    const product = new Product({
       name,
       description,
       price,
@@ -74,12 +65,13 @@ export async function POST(request: Request) {
       size,
       tags,
       status,
-      swiperInicioString,
+      swiperInicio: swiperInicioString,
     });
-    console.log(products);
-    await products.save();
-    return NextResponse.json(products, { status: 201 });
+
+    console.log(product);
+    await product.save();
+    return NextResponse.json(product, { status: 201 });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message });
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
