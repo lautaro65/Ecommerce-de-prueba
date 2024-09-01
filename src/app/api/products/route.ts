@@ -3,9 +3,12 @@ import Product from "@/app/models/products";
 import dbConnect from "@/app/lib/dbConnect";
 
 export async function GET(req: NextRequest) {
+  console.log('Starting GET request');
   await dbConnect();
   try {
+    console.log('Database connected');
     const products = await Product.find({});
+    console.log('Products fetched');
     return NextResponse.json(products);
   } catch (error: any) {
     console.error('Error fetching products:', error);
